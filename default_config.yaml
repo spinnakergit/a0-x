@@ -1,0 +1,55 @@
+# X.com (Twitter) Integration — Default Configuration
+
+# API tier: pay_per_use (recommended), free (legacy), basic (legacy), pro (legacy)
+# Pay-Per-Use launched Feb 2026 — credit-based, no subscription, all endpoints.
+# Legacy tiers (Free/Basic/Pro) still functional for existing subscribers.
+tier: "pay_per_use"
+
+# Service toggles — disable to hide tools from the agent
+services:
+  posting:
+    enabled: true
+  reading:
+    enabled: true
+  search:
+    enabled: true
+  media:
+    enabled: true
+  analytics:
+    enabled: true
+
+# OAuth 1.0a credentials (required for media upload + legacy endpoints)
+# Get these from developer.x.com > Your App > Keys and Tokens
+oauth1:
+  api_key: ""
+  api_secret: ""
+  access_token: ""
+  access_token_secret: ""
+
+# OAuth 2.0 PKCE credentials (for API v2 user-context endpoints)
+# Get Client ID from developer.x.com > Your App > OAuth 2.0 settings
+oauth2:
+  client_id: ""
+  client_secret: ""
+
+# App-only Bearer Token (for read endpoints without user context)
+bearer_token: ""
+
+# Defaults
+defaults:
+  thread_numbering: true
+  max_results: 20
+
+# Usage management
+usage:
+  daily_tweet_limit: 50
+
+# Memory integration
+memory:
+  auto_save: true
+  export_format: "markdown"
+
+# Security
+security:
+  sanitize_content: true
+  max_tweet_length: 280

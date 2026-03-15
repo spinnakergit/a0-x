@@ -1,0 +1,24 @@
+# Runtime data (credentials, tokens, usage tracking)
+data/
+*.tmp
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.*
+
+# Plugin state
+config.json
+.toggle-*
