@@ -1,7 +1,7 @@
 <html>
 <head><title>X.com</title></head>
 <body>
-    <div x-data="{ activeTab: 'auth', oauth2Status: '', oauth2StatusColor: '', oauth2CallbackVisible: false, oauth2CallbackStatus: '', oauth2CallbackStatusColor: '' }" x-init="
+    <div x-data="{ activeTab: 'auth', oauth2Status: '', oauth2StatusColor: '', oauth2CallbackVisible: false, oauth2CallbackStatus: '', oauth2CallbackStatusColor: '', _cbCode: '', _cbState: '' }" x-init="
         if (!config.tier) config.tier = 'pay_per_use';
         if (!config.oauth1) config.oauth1 = {};
         if (!config.oauth1.api_key) config.oauth1.api_key = '';
@@ -46,6 +46,8 @@
 
                 <!-- Auth Tab -->
                 <div x-show="activeTab === 'auth'">
+                    <div class="section-description">Need help? See the <a href="https://github.com/spinnakergit/a0-x/blob/main/docs/SETUP.md" target="_blank" style="color: var(--link-color, #1a73e8);">Setup Guide</a> for step-by-step instructions including developer onboarding and credential mapping.</div>
+
                     <div class="section-title">API Tier</div>
                     <div class="field">
                         <div class="field-label">
@@ -67,19 +69,19 @@
 
                     <div class="field">
                         <div class="field-label">
-                            <div class="field-title">API Key</div>
+                            <div class="field-title">Consumer Key</div>
                         </div>
                         <div class="field-control">
-                            <input type="password" x-model="config.oauth1.api_key" placeholder="API Key">
+                            <input type="password" x-model="config.oauth1.api_key" placeholder="Consumer Key">
                         </div>
                     </div>
 
                     <div class="field">
                         <div class="field-label">
-                            <div class="field-title">API Secret</div>
+                            <div class="field-title">Consumer Key Secret</div>
                         </div>
                         <div class="field-control">
-                            <input type="password" x-model="config.oauth1.api_secret" placeholder="API Secret">
+                            <input type="password" x-model="config.oauth1.api_secret" placeholder="Consumer Key Secret">
                         </div>
                     </div>
 
@@ -166,16 +168,19 @@
                             <div class="field-control" style="display: flex; gap: 6px; align-items: center;">
                                 <input type="text" x-ref="callbackUrl" placeholder="http://localhost:3000/callback?code=...&state=..." style="flex: 1;">
                                 <button class="btn btn-field" @click="
-                                    var val = $refs.callbackUrl.value.trim();
-                                    if (!val) { oauth2CallbackStatus = 'Paste the redirect URL first'; oauth2CallbackStatusColor = '#c62828'; return; }
-                                    var code = '', state = '';
-                                    try { var u = new URL(val); code = u.searchParams.get('code') || ''; state = u.searchParams.get('state') || ''; } catch(e) { code = val; }
-                                    if (!code) { oauth2CallbackStatus = 'Could not find authorization code'; oauth2CallbackStatusColor = '#c62828'; return; }
+                                    if (!$refs.callbackUrl.value.trim()) { oauth2CallbackStatus = 'Paste the redirect URL first'; oauth2CallbackStatusColor = '#c62828'; return; }
+                                    _cbCode = ''; _cbState = '';
+                                    if ($refs.callbackUrl.value.trim().includes('?')) {
+                                        _cbCode = new URLSearchParams($refs.callbackUrl.value.trim().split('?').slice(1).join('?')).get('code') || '';
+                                        _cbState = new URLSearchParams($refs.callbackUrl.value.trim().split('?').slice(1).join('?')).get('state') || '';
+                                    }
+                                    if (!_cbCode) _cbCode = $refs.callbackUrl.value.trim();
+                                    if (!_cbCode) { oauth2CallbackStatus = 'Could not find authorization code'; oauth2CallbackStatusColor = '#c62828'; return; }
                                     oauth2CallbackStatus = 'Exchanging code for token...'; oauth2CallbackStatusColor = '#e65100';
                                     (globalThis.fetchApi || fetch)('/api/plugins/x/x_config_api', {
                                         method: 'POST',
                                         headers: {'Content-Type': 'application/json'},
-                                        body: JSON.stringify({action: 'oauth2_callback', code: code, state: state})
+                                        body: JSON.stringify({action: 'oauth2_callback', code: _cbCode, state: _cbState})
                                     }).then(r => r.json()).then(d => {
                                         if (d.ok) {
                                             oauth2CallbackStatus = 'OAuth 2.0 connected!'; oauth2CallbackStatusColor = '#2e7d32';

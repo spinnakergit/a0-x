@@ -44,6 +44,57 @@ docker exec a0-container supervisorctl restart run_ui
 
 ## X Developer Account Setup
 
+### 0. Developer Onboarding
+
+Before creating an app, you must complete the X Developer onboarding:
+
+1. Go to [console.x.com/onboarding](https://console.x.com/onboarding)
+2. Review and accept the following agreements:
+   - **Developer Agreement** — License terms, data handling obligations, termination rights
+   - **Incorporated Developer Terms** — Technical and operational requirements
+   - **X Developer Policy** — Permitted/restricted uses, automation rules, privacy requirements
+3. Complete your developer profile
+4. When prompted to **"Describe all of your use cases of X's data and API"**, provide a description of how you intend to use the API. Your use case description is binding per the Developer Agreement — substantive deviations may constitute a violation.
+
+#### Sample Use Case Description
+
+Below is a sample you can adapt to fit your specific needs:
+
+> Personal content management and engagement on X via an AI assistant (Agent Zero). The application enables a single authenticated user to:
+>
+> - Compose and post tweets, threads, and replies on their own account
+> - Schedule posts via the assistant's task scheduling capability
+> - Upload images, videos, and GIFs as media attachments
+> - Read and search public tweets for topic research and conversation discovery
+> - View engagement analytics (likes, retweets, impressions) on own posts
+> - Manage engagement actions (like, retweet, bookmark) on individual posts
+> - Look up public user profiles
+>
+> Posts may be scheduled or coordinated through the assistant's automation features, but all content is authored or approved by the account owner. No bulk operations or multi-account management. No DM access. No data is cached offline or used for training AI models. OAuth 2.0 PKCE is used for authentication.
+
+#### Key Policy Requirements
+
+By accepting these agreements, you are committing to:
+
+- **No spam or platform manipulation** — No bulk following, coordinated posting across accounts, or identical content on multiple accounts
+- **Explicit user consent** — Obtain consent before taking actions on behalf of users or sending automated messages
+- **Content integrity** — Do not modify tweet content; remove deleted/protected content within 24 hours
+- **Credential security** — Keep all API keys and tokens private; use OAuth authentication (never store passwords)
+- **Rate limit compliance** — Respect all API rate limits; do not attempt to circumvent them
+- **No sensitive data derivation** — Do not infer health, political affiliation, ethnicity, religion, or sexual orientation from user data
+- **No AI training** — Do not use X content to fine-tune or train foundation models
+- **No surveillance** — Do not use the API for user tracking, background checks, or monitoring
+- **Bot disclosure** — If operating an automated account, clearly identify it as a bot in the account bio
+- **Privacy policy** — Your use of X data must be covered by a privacy policy no less protective than X's own
+- **Use case binding** — Your described use case during onboarding is binding; substantive deviations may violate the agreement
+
+> **Note:** This plugin is designed to comply with all of the above. It enforces rate limits, uses OAuth authentication, does not cache content offline, and its agent prompts discourage spam and inauthentic engagement. However, **you as the account operator** are ultimately responsible for how you use the API.
+
+Full policy documents:
+- [Developer Agreement](https://developer.x.com/en/developer-terms/agreement)
+- [Developer Policy](https://developer.x.com/en/developer-terms/policy)
+- [Restricted Use Cases](https://developer.x.com/en/developer-terms/restricted-use-cases)
+
 ### 1. Create a Project and App
 
 1. Go to [developer.x.com/en/portal/dashboard](https://developer.x.com/en/portal/dashboard)
@@ -63,8 +114,8 @@ You need credentials from **two different sections** of the X Developer Console:
 
 | Console Section | Console Label | What It Is |
 |----------------|---------------|------------|
-| Consumer Keys | API Key | OAuth 1.0a consumer key |
-| Consumer Keys | API Key Secret | OAuth 1.0a consumer secret |
+| Consumer Keys | Consumer Key | OAuth 1.0a consumer key |
+| Consumer Keys | Consumer Key Secret | OAuth 1.0a consumer secret |
 | Authentication Tokens | Access Token | OAuth 1.0a user access token |
 | Authentication Tokens | Access Token Secret | OAuth 1.0a user access token secret |
 | Authentication Tokens | Bearer Token | App-only bearer token (optional) |
@@ -92,8 +143,8 @@ See [QUICKSTART.md](QUICKSTART.md) for step-by-step configuration in the WebUI.
 
 | X Console Location | Console Label | Plugin Config Field |
 |---|---|---|
-| Keys and tokens > Consumer Keys | API Key | Auth > OAuth 1.0a > API Key |
-| Keys and tokens > Consumer Keys | API Key Secret | Auth > OAuth 1.0a > API Secret |
+| Keys and tokens > Consumer Keys | Consumer Key | Auth > OAuth 1.0a > Consumer Key |
+| Keys and tokens > Consumer Keys | Consumer Key Secret | Auth > OAuth 1.0a > Consumer Key Secret |
 | Keys and tokens > Authentication Tokens | Access Token | Auth > OAuth 1.0a > Access Token |
 | Keys and tokens > Authentication Tokens | Access Token Secret | Auth > OAuth 1.0a > Access Token Secret |
 | Settings > User auth settings | Client ID | Auth > OAuth 2.0 > Client ID |
@@ -101,7 +152,7 @@ See [QUICKSTART.md](QUICKSTART.md) for step-by-step configuration in the WebUI.
 | Settings > User auth settings | Callback URI | Auth > OAuth 2.0 > Callback URL |
 | Keys and tokens > Authentication Tokens | Bearer Token | Auth > Bearer Token |
 
-> **Important:** "Consumer Keys" (API Key) and "OAuth 2.0" (Client ID) are **different credentials** from different sections. Do not mix them up.
+> **Important:** "Consumer Keys" (Consumer Key) and "OAuth 2.0" (Client ID) are **different credentials** from different sections. Do not mix them up.
 
 ## Verifying Installation
 
