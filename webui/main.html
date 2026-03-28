@@ -34,8 +34,8 @@
 
     <!-- Actions -->
     <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-        <button data-xm="test-btn" style="background: #1d9bf0; color: #fff; border: none; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-size: 12px;">Test Connection</button>
-        <button data-xm="refresh-btn" style="background: var(--bg-secondary, #e0e0e0); color: var(--text-primary, #333); border: none; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-size: 12px;">Refresh</button>
+        <button data-xm="test-btn" onclick="window._xcMain.testConnection()" style="background: #1d9bf0; color: #fff; border: none; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-size: 12px;">Test Connection</button>
+        <button data-xm="refresh-btn" onclick="window._xcMain.refresh()" style="background: var(--bg-secondary, #e0e0e0); color: var(--text-primary, #333); border: none; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-size: 12px;">Refresh</button>
     </div>
 
     <!-- Services Status -->
@@ -47,7 +47,7 @@
 
 <script>
 (function() {
-    var fetchApi = globalThis.fetchApi || fetch;
+    function fetchApi(url, opts) { return (globalThis.fetchApi || fetch)(url, opts); }
     var API_TEST = '/api/plugins/x/x_test';
     var API_CONFIG = '/api/plugins/x/x_config_api';
 
@@ -146,9 +146,9 @@
         }
     }
 
-    $('test-btn')?.addEventListener('click', testConnection);
-    $('refresh-btn')?.addEventListener('click', function() { testConnection(); loadDashboard(); });
-    testConnection();
-    loadDashboard();
+    function refresh() { testConnection(); loadDashboard(); }
+
+    window._xcMain = { testConnection: testConnection, refresh: refresh };
+    setTimeout(function() { testConnection(); loadDashboard(); }, 50);
 })();
 </script>

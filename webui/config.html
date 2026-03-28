@@ -1,323 +1,323 @@
-<div class="x-config" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 16px;">
-
-    <h4 style="margin: 0 0 16px 0; color: #1d9bf0;">X.com Settings</h4>
-
-    <!-- Tabs -->
-    <div data-xc="tabs" style="display: flex; gap: 0; border-bottom: 2px solid var(--border-color, #e0e0e0); margin-bottom: 16px;">
-        <button data-xc="tab-auth" class="xc-tab" style="padding: 8px 16px; border: none; background: none; cursor: pointer; font-size: 12px; font-weight: 600; color: #1d9bf0; border-bottom: 2px solid #1d9bf0; margin-bottom: -2px;">Authentication</button>
-        <button data-xc="tab-services" class="xc-tab" style="padding: 8px 16px; border: none; background: none; cursor: pointer; font-size: 12px; color: var(--text-secondary, #888); margin-bottom: -2px;">Services</button>
-        <button data-xc="tab-defaults" class="xc-tab" style="padding: 8px 16px; border: none; background: none; cursor: pointer; font-size: 12px; color: var(--text-secondary, #888); margin-bottom: -2px;">Defaults</button>
-        <button data-xc="tab-security" class="xc-tab" style="padding: 8px 16px; border: none; background: none; cursor: pointer; font-size: 12px; color: var(--text-secondary, #888); margin-bottom: -2px;">Security</button>
-    </div>
-
-    <!-- Auth Tab -->
-    <div data-xc="panel-auth" class="xc-panel">
-        <div style="margin-bottom: 12px;">
-            <label style="display: block; font-weight: 600; margin-bottom: 4px; font-size: 13px;">API Tier</label>
-            <select data-xc="tier" style="width: 100%; padding: 6px 10px; border: 1px solid var(--border-color, #ccc); border-radius: 4px; font-size: 13px;">
-                <option value="pay_per_use">Pay-Per-Use (recommended — credit-based, all endpoints)</option>
-                <option value="free">Free — legacy (1,500 tweets/mo, write-only)</option>
-                <option value="basic">Basic — legacy $200/mo (read + search + write)</option>
-                <option value="pro">Pro — legacy $5,000/mo (full access)</option>
-            </select>
-        </div>
-
-        <fieldset style="border: 1px solid var(--border-color, #ccc); border-radius: 6px; padding: 12px; margin-bottom: 12px;">
-            <legend style="font-weight: 600; font-size: 12px; padding: 0 6px;">OAuth 1.0a (Media Upload + Legacy)</legend>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-                <div>
-                    <label style="font-size: 11px; color: var(--text-secondary, #888);">API Key</label>
-                    <input data-xc="oauth1_api_key" type="password" style="width: 100%; padding: 5px 8px; border: 1px solid var(--border-color, #ccc); border-radius: 4px; font-size: 12px; box-sizing: border-box;">
+<html>
+<head><title>X.com</title></head>
+<body>
+    <div x-data="{ activeTab: 'auth', oauth2Status: '', oauth2StatusColor: '', oauth2CallbackVisible: false, oauth2CallbackStatus: '', oauth2CallbackStatusColor: '' }" x-init="
+        if (!config.tier) config.tier = 'pay_per_use';
+        if (!config.oauth1) config.oauth1 = {};
+        if (!config.oauth1.api_key) config.oauth1.api_key = '';
+        if (!config.oauth1.api_secret) config.oauth1.api_secret = '';
+        if (!config.oauth1.access_token) config.oauth1.access_token = '';
+        if (!config.oauth1.access_token_secret) config.oauth1.access_token_secret = '';
+        if (!config.oauth2) config.oauth2 = {};
+        if (!config.oauth2.client_id) config.oauth2.client_id = '';
+        if (!config.oauth2.client_secret) config.oauth2.client_secret = '';
+        if (!config.oauth2.redirect_uri) config.oauth2.redirect_uri = 'http://localhost:3000/callback';
+        if (!config.bearer_token) config.bearer_token = '';
+        if (!config.services) config.services = {};
+        if (!config.services.posting) config.services.posting = {};
+        if (!config.services.reading) config.services.reading = {};
+        if (!config.services.search) config.services.search = {};
+        if (!config.services.media) config.services.media = {};
+        if (!config.services.analytics) config.services.analytics = {};
+        if (config.services.posting.enabled === undefined) config.services.posting.enabled = true;
+        if (config.services.reading.enabled === undefined) config.services.reading.enabled = true;
+        if (config.services.search.enabled === undefined) config.services.search.enabled = true;
+        if (config.services.media.enabled === undefined) config.services.media.enabled = true;
+        if (config.services.analytics.enabled === undefined) config.services.analytics.enabled = true;
+        if (!config.defaults) config.defaults = {};
+        if (!config.defaults.max_results) config.defaults.max_results = 20;
+        if (config.defaults.thread_numbering === undefined) config.defaults.thread_numbering = true;
+        if (!config.usage) config.usage = {};
+        if (!config.usage.daily_tweet_limit) config.usage.daily_tweet_limit = 50;
+        if (!config.security) config.security = {};
+        if (config.security.sanitize_content === undefined) config.security.sanitize_content = true;
+        if (!config.security.max_tweet_length) config.security.max_tweet_length = 280;
+    ">
+        <template x-if="config">
+            <div>
+                <!-- Tab Navigation -->
+                <div style="display: flex; gap: 0; border-bottom: 2px solid var(--border-color, #e0e0e0); margin-bottom: 16px;">
+                    <template x-for="tab in ['auth', 'services', 'defaults', 'security']">
+                        <button @click="activeTab = tab"
+                            :style="'padding: 8px 16px; border: none; background: none; cursor: pointer; font-size: 12px; font-weight: 600; margin-bottom: -2px; color: ' + (activeTab === tab ? '#000000' : 'var(--text-secondary, #888)') + '; border-bottom: 2px solid ' + (activeTab === tab ? '#000000' : 'transparent')"
+                            x-text="tab === 'auth' ? 'Authentication' : tab.charAt(0).toUpperCase() + tab.slice(1)"></button>
+                    </template>
                 </div>
-                <div>
-                    <label style="font-size: 11px; color: var(--text-secondary, #888);">API Secret</label>
-                    <input data-xc="oauth1_api_secret" type="password" style="width: 100%; padding: 5px 8px; border: 1px solid var(--border-color, #ccc); border-radius: 4px; font-size: 12px; box-sizing: border-box;">
+
+                <!-- Auth Tab -->
+                <div x-show="activeTab === 'auth'">
+                    <div class="section-title">API Tier</div>
+                    <div class="field">
+                        <div class="field-label">
+                            <div class="field-title">API Access Tier</div>
+                            <div class="field-description">Pay-Per-Use is recommended (credit-based, all endpoints).</div>
+                        </div>
+                        <div class="field-control">
+                            <select x-model="config.tier">
+                                <option value="pay_per_use">Pay-Per-Use (recommended)</option>
+                                <option value="free">Free — legacy (1,500 tweets/mo, write-only)</option>
+                                <option value="basic">Basic — legacy $200/mo (read + search + write)</option>
+                                <option value="pro">Pro — legacy $5,000/mo (full access)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="section-title">OAuth 1.0a (Media Upload + Legacy)</div>
+                    <div class="section-description">Get these from developer.x.com > Your App > Keys and Tokens.</div>
+
+                    <div class="field">
+                        <div class="field-label">
+                            <div class="field-title">API Key</div>
+                        </div>
+                        <div class="field-control">
+                            <input type="password" x-model="config.oauth1.api_key" placeholder="API Key">
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <div class="field-label">
+                            <div class="field-title">API Secret</div>
+                        </div>
+                        <div class="field-control">
+                            <input type="password" x-model="config.oauth1.api_secret" placeholder="API Secret">
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <div class="field-label">
+                            <div class="field-title">Access Token</div>
+                        </div>
+                        <div class="field-control">
+                            <input type="password" x-model="config.oauth1.access_token" placeholder="Access Token">
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <div class="field-label">
+                            <div class="field-title">Access Token Secret</div>
+                        </div>
+                        <div class="field-control">
+                            <input type="password" x-model="config.oauth1.access_token_secret" placeholder="Access Token Secret">
+                        </div>
+                    </div>
+
+                    <div class="section-title">OAuth 2.0 PKCE (API v2)</div>
+                    <div class="section-description">Get Client ID from developer.x.com > Your App > OAuth 2.0 settings.</div>
+
+                    <div class="field">
+                        <div class="field-label">
+                            <div class="field-title">Client ID</div>
+                        </div>
+                        <div class="field-control">
+                            <input type="password" x-model="config.oauth2.client_id" placeholder="Client ID">
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <div class="field-label">
+                            <div class="field-title">Client Secret (optional)</div>
+                        </div>
+                        <div class="field-control">
+                            <input type="password" x-model="config.oauth2.client_secret" placeholder="Client Secret">
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <div class="field-label">
+                            <div class="field-title">Callback URL</div>
+                            <div class="field-description">Must match the URL configured in X Developer Console.</div>
+                        </div>
+                        <div class="field-control">
+                            <input type="text" x-model="config.oauth2.redirect_uri" placeholder="http://localhost:3000/callback">
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <div class="field-label">
+                            <div class="field-title">OAuth 2.0 Authorization</div>
+                            <div class="field-description">Start the flow to authorize API v2 access.</div>
+                        </div>
+                        <div class="field-control">
+                            <button class="btn btn-field" @click="
+                                oauth2Status = 'Generating auth URL...'; oauth2StatusColor = '#e65100';
+                                (globalThis.fetchApi || fetch)('/api/plugins/x/x_config_api', {
+                                    method: 'POST',
+                                    headers: {'Content-Type': 'application/json'},
+                                    body: JSON.stringify({action: 'oauth2_url'})
+                                }).then(r => r.json()).then(d => {
+                                    if (d.ok && d.url) {
+                                        window.open(d.url, '_blank');
+                                        oauth2Status = 'Auth page opened — authorize and paste the redirect URL below';
+                                        oauth2StatusColor = '#e65100';
+                                        oauth2CallbackVisible = true;
+                                    } else { oauth2Status = d.error || 'Failed'; oauth2StatusColor = '#c62828'; }
+                                }).catch(() => { oauth2Status = 'Error generating URL'; oauth2StatusColor = '#c62828'; });
+                            ">Start OAuth 2.0 Flow</button>
+                            <span :style="'font-size: 11px; margin-left: 8px; color: ' + oauth2StatusColor" x-text="oauth2Status"></span>
+                        </div>
+                    </div>
+
+                    <div x-show="oauth2CallbackVisible" style="padding: 10px; background: var(--bg-secondary, #f5f5f5); border-radius: 6px; margin-bottom: 12px;">
+                        <div class="field">
+                            <div class="field-label">
+                                <div class="field-title">Paste Redirect URL</div>
+                                <div class="field-description">After authorizing, paste the full redirect URL from your browser's address bar.</div>
+                            </div>
+                            <div class="field-control" style="display: flex; gap: 6px; align-items: center;">
+                                <input type="text" x-ref="callbackUrl" placeholder="http://localhost:3000/callback?code=...&state=..." style="flex: 1;">
+                                <button class="btn btn-field" @click="
+                                    var val = $refs.callbackUrl.value.trim();
+                                    if (!val) { oauth2CallbackStatus = 'Paste the redirect URL first'; oauth2CallbackStatusColor = '#c62828'; return; }
+                                    var code = '', state = '';
+                                    try { var u = new URL(val); code = u.searchParams.get('code') || ''; state = u.searchParams.get('state') || ''; } catch(e) { code = val; }
+                                    if (!code) { oauth2CallbackStatus = 'Could not find authorization code'; oauth2CallbackStatusColor = '#c62828'; return; }
+                                    oauth2CallbackStatus = 'Exchanging code for token...'; oauth2CallbackStatusColor = '#e65100';
+                                    (globalThis.fetchApi || fetch)('/api/plugins/x/x_config_api', {
+                                        method: 'POST',
+                                        headers: {'Content-Type': 'application/json'},
+                                        body: JSON.stringify({action: 'oauth2_callback', code: code, state: state})
+                                    }).then(r => r.json()).then(d => {
+                                        if (d.ok) {
+                                            oauth2CallbackStatus = 'OAuth 2.0 connected!'; oauth2CallbackStatusColor = '#2e7d32';
+                                            oauth2Status = 'Connected'; oauth2StatusColor = '#2e7d32';
+                                            setTimeout(() => oauth2CallbackVisible = false, 3000);
+                                        } else { oauth2CallbackStatus = d.error || 'Token exchange failed'; oauth2CallbackStatusColor = '#c62828'; }
+                                    }).catch(() => { oauth2CallbackStatus = 'Request failed'; oauth2CallbackStatusColor = '#c62828'; });
+                                ">Complete Authorization</button>
+                            </div>
+                            <span :style="'font-size: 11px; color: ' + oauth2CallbackStatusColor" x-text="oauth2CallbackStatus"></span>
+                        </div>
+                    </div>
+
+                    <div class="section-title">Bearer Token (App-only)</div>
+                    <div class="field">
+                        <div class="field-label">
+                            <div class="field-title">Bearer Token</div>
+                            <div class="field-description">Optional: for read operations without user context.</div>
+                        </div>
+                        <div class="field-control">
+                            <input type="password" x-model="config.bearer_token" placeholder="App-only bearer token">
+                        </div>
+                    </div>
                 </div>
-                <div>
-                    <label style="font-size: 11px; color: var(--text-secondary, #888);">Access Token</label>
-                    <input data-xc="oauth1_access_token" type="password" style="width: 100%; padding: 5px 8px; border: 1px solid var(--border-color, #ccc); border-radius: 4px; font-size: 12px; box-sizing: border-box;">
+
+                <!-- Services Tab -->
+                <div x-show="activeTab === 'services'">
+                    <div class="section-title">Enable/Disable Services</div>
+                    <div class="section-description">Toggle services on/off. Reading/search/analytics require Pay-Per-Use or Basic+ tier.</div>
+
+                    <div class="field">
+                        <div class="field-label">
+                            <div class="field-title">Posting</div>
+                            <div class="field-description">All tiers.</div>
+                        </div>
+                        <div class="field-control">
+                            <label class="toggle"><input type="checkbox" x-model="config.services.posting.enabled"><span class="toggler"></span></label>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <div class="field-label">
+                            <div class="field-title">Reading</div>
+                            <div class="field-description">Pay-Per-Use / Basic+.</div>
+                        </div>
+                        <div class="field-control">
+                            <label class="toggle"><input type="checkbox" x-model="config.services.reading.enabled"><span class="toggler"></span></label>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <div class="field-label">
+                            <div class="field-title">Search</div>
+                            <div class="field-description">Pay-Per-Use / Basic+.</div>
+                        </div>
+                        <div class="field-control">
+                            <label class="toggle"><input type="checkbox" x-model="config.services.search.enabled"><span class="toggler"></span></label>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <div class="field-label">
+                            <div class="field-title">Media Upload</div>
+                            <div class="field-description">All tiers.</div>
+                        </div>
+                        <div class="field-control">
+                            <label class="toggle"><input type="checkbox" x-model="config.services.media.enabled"><span class="toggler"></span></label>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <div class="field-label">
+                            <div class="field-title">Analytics</div>
+                            <div class="field-description">Pay-Per-Use / Basic+.</div>
+                        </div>
+                        <div class="field-control">
+                            <label class="toggle"><input type="checkbox" x-model="config.services.analytics.enabled"><span class="toggler"></span></label>
+                        </div>
+                    </div>
                 </div>
-                <div>
-                    <label style="font-size: 11px; color: var(--text-secondary, #888);">Access Token Secret</label>
-                    <input data-xc="oauth1_access_token_secret" type="password" style="width: 100%; padding: 5px 8px; border: 1px solid var(--border-color, #ccc); border-radius: 4px; font-size: 12px; box-sizing: border-box;">
+
+                <!-- Defaults Tab -->
+                <div x-show="activeTab === 'defaults'">
+                    <div class="section-title">Posting & Search Defaults</div>
+
+                    <div class="field">
+                        <div class="field-label">
+                            <div class="field-title">Daily Tweet Limit</div>
+                            <div class="field-description">Safety limit per day (independent of API tier limits).</div>
+                        </div>
+                        <div class="field-control">
+                            <input type="number" min="1" max="1500" x-model.number="config.usage.daily_tweet_limit">
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <div class="field-label">
+                            <div class="field-title">Default Max Results</div>
+                            <div class="field-description">Maximum results per search query (1-100).</div>
+                        </div>
+                        <div class="field-control">
+                            <input type="number" min="1" max="100" x-model.number="config.defaults.max_results">
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <div class="field-label">
+                            <div class="field-title">Thread numbering</div>
+                            <div class="field-description">Add numbering to thread tweets (1/5, 2/5...).</div>
+                        </div>
+                        <div class="field-control">
+                            <label class="toggle"><input type="checkbox" x-model="config.defaults.thread_numbering"><span class="toggler"></span></label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Security Tab -->
+                <div x-show="activeTab === 'security'">
+                    <div class="section-title">Security Settings</div>
+
+                    <div class="field">
+                        <div class="field-label">
+                            <div class="field-title">Sanitize content</div>
+                            <div class="field-description">Strip zero-width chars, normalize Unicode.</div>
+                        </div>
+                        <div class="field-control">
+                            <label class="toggle"><input type="checkbox" x-model="config.security.sanitize_content"><span class="toggler"></span></label>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <div class="field-label">
+                            <div class="field-title">Max Tweet Length</div>
+                            <div class="field-description">Maximum characters per tweet (1-280).</div>
+                        </div>
+                        <div class="field-control">
+                            <input type="number" min="1" max="280" x-model.number="config.security.max_tweet_length">
+                        </div>
+                    </div>
                 </div>
             </div>
-        </fieldset>
-
-        <fieldset style="border: 1px solid var(--border-color, #ccc); border-radius: 6px; padding: 12px; margin-bottom: 12px;">
-            <legend style="font-weight: 600; font-size: 12px; padding: 0 6px;">OAuth 2.0 PKCE (API v2)</legend>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
-                <div>
-                    <label style="font-size: 11px; color: var(--text-secondary, #888);">Client ID</label>
-                    <input data-xc="oauth2_client_id" type="password" style="width: 100%; padding: 5px 8px; border: 1px solid var(--border-color, #ccc); border-radius: 4px; font-size: 12px; box-sizing: border-box;">
-                </div>
-                <div>
-                    <label style="font-size: 11px; color: var(--text-secondary, #888);">Client Secret (optional)</label>
-                    <input data-xc="oauth2_client_secret" type="password" style="width: 100%; padding: 5px 8px; border: 1px solid var(--border-color, #ccc); border-radius: 4px; font-size: 12px; box-sizing: border-box;">
-                </div>
-            </div>
-            <div style="margin-bottom: 8px;">
-                <label style="font-size: 11px; color: var(--text-secondary, #888);">Callback URL (must match X Developer Console)</label>
-                <input data-xc="oauth2_redirect_uri" type="text" placeholder="http://localhost:3000/callback" value="http://localhost:3000/callback"
-                       style="width: 100%; padding: 5px 8px; border: 1px solid var(--border-color, #ccc); border-radius: 4px; font-size: 12px; box-sizing: border-box;">
-            </div>
-            <button data-xc="oauth2-btn" style="background: #1d9bf0; color: #fff; border: none; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-size: 12px;">Start OAuth 2.0 Flow</button>
-            <span data-xc="oauth2-status" style="margin-left: 8px; font-size: 11px;"></span>
-            <!-- Callback code entry (shown after auth redirect) -->
-            <div data-xc="oauth2-callback-section" style="display: none; margin-top: 10px; padding: 10px; background: var(--bg-secondary, #f5f5f5); border-radius: 6px;">
-                <p style="font-size: 11px; color: var(--text-secondary, #888); margin: 0 0 6px;">After authorizing, paste the full redirect URL from your browser's address bar:</p>
-                <input data-xc="oauth2-callback-url" type="text" placeholder="http://localhost:3000/callback?code=...&state=..."
-                       style="width: 100%; padding: 5px 8px; border: 1px solid var(--border-color, #ccc); border-radius: 4px; font-size: 11px; box-sizing: border-box; margin-bottom: 6px;">
-                <button data-xc="oauth2-complete-btn" style="background: #2e7d32; color: #fff; border: none; padding: 5px 12px; border-radius: 4px; cursor: pointer; font-size: 11px;">Complete Authorization</button>
-                <span data-xc="oauth2-callback-status" style="margin-left: 8px; font-size: 11px;"></span>
-            </div>
-        </fieldset>
-
-        <div style="margin-bottom: 12px;">
-            <label style="display: block; font-weight: 600; margin-bottom: 4px; font-size: 13px;">Bearer Token (App-only)</label>
-            <input data-xc="bearer_token" type="password" placeholder="App-only bearer token"
-                   style="width: 100%; padding: 6px 10px; border: 1px solid var(--border-color, #ccc); border-radius: 4px; font-size: 13px; box-sizing: border-box;">
-            <small style="color: var(--text-secondary, #888);">Optional: for read operations without user context</small>
-        </div>
+        </template>
     </div>
-
-    <!-- Services Tab -->
-    <div data-xc="panel-services" class="xc-panel" style="display: none;">
-        <p style="font-size: 12px; color: var(--text-secondary, #888); margin: 0 0 12px;">Toggle services on/off. Reading/search/analytics require Pay-Per-Use or Basic+ tier.</p>
-        <div style="display: flex; flex-direction: column; gap: 8px;">
-            <label style="display: flex; align-items: center; gap: 8px; font-size: 13px;"><input data-xc="svc-posting" type="checkbox" checked> Posting (all tiers)</label>
-            <label style="display: flex; align-items: center; gap: 8px; font-size: 13px;"><input data-xc="svc-reading" type="checkbox" checked> Reading (Pay-Per-Use / Basic+)</label>
-            <label style="display: flex; align-items: center; gap: 8px; font-size: 13px;"><input data-xc="svc-search" type="checkbox" checked> Search (Pay-Per-Use / Basic+)</label>
-            <label style="display: flex; align-items: center; gap: 8px; font-size: 13px;"><input data-xc="svc-media" type="checkbox" checked> Media Upload (all tiers)</label>
-            <label style="display: flex; align-items: center; gap: 8px; font-size: 13px;"><input data-xc="svc-analytics" type="checkbox" checked> Analytics (Pay-Per-Use / Basic+)</label>
-        </div>
-    </div>
-
-    <!-- Defaults Tab -->
-    <div data-xc="panel-defaults" class="xc-panel" style="display: none;">
-        <div style="margin-bottom: 12px;">
-            <label style="display: block; font-weight: 600; margin-bottom: 4px; font-size: 13px;">Daily Tweet Limit</label>
-            <input data-xc="daily_limit" type="number" value="50" min="1" max="1500"
-                   style="width: 120px; padding: 6px 10px; border: 1px solid var(--border-color, #ccc); border-radius: 4px; font-size: 13px;">
-            <small style="color: var(--text-secondary, #888); display: block;">Safety limit per day (independent of API tier limits)</small>
-        </div>
-        <div style="margin-bottom: 12px;">
-            <label style="display: block; font-weight: 600; margin-bottom: 4px; font-size: 13px;">Default Max Results</label>
-            <input data-xc="max_results" type="number" value="20" min="1" max="100"
-                   style="width: 120px; padding: 6px 10px; border: 1px solid var(--border-color, #ccc); border-radius: 4px; font-size: 13px;">
-        </div>
-        <label style="display: flex; align-items: center; gap: 8px; font-size: 13px;">
-            <input data-xc="thread_numbering" type="checkbox" checked> Add numbering to thread tweets (1/5, 2/5...)
-        </label>
-    </div>
-
-    <!-- Security Tab -->
-    <div data-xc="panel-security" class="xc-panel" style="display: none;">
-        <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; margin-bottom: 8px;">
-            <input data-xc="sanitize_content" type="checkbox" checked> Sanitize content (strip zero-width chars, normalize Unicode)
-        </label>
-        <div style="margin-bottom: 12px;">
-            <label style="display: block; font-weight: 600; margin-bottom: 4px; font-size: 13px;">Max Tweet Length</label>
-            <input data-xc="max_tweet_length" type="number" value="280" min="1" max="280"
-                   style="width: 120px; padding: 6px 10px; border: 1px solid var(--border-color, #ccc); border-radius: 4px; font-size: 13px;">
-        </div>
-    </div>
-
-    <!-- Save -->
-    <div style="margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--border-color, #e0e0e0);">
-        <button data-xc="save-btn" style="background: #1d9bf0; color: #fff; border: none; padding: 8px 20px; border-radius: 4px; cursor: pointer; font-size: 13px;">Save Settings</button>
-        <span data-xc="save-status" style="margin-left: 10px; font-size: 12px;"></span>
-    </div>
-</div>
-
-<script>
-(function() {
-    var fetchApi = globalThis.fetchApi || fetch;
-    var API = '/api/plugins/x/x_config_api';
-
-    var root = document.querySelector('.x-config')
-            || document.currentScript?.parentElement;
-    if (!root) { console.error('x config: root not found'); return; }
-
-    function el(key) { return root.querySelector('[data-xc="' + key + '"]'); }
-
-    // Tab switching
-    root.querySelectorAll('.xc-tab').forEach(function(tab) {
-        tab.addEventListener('click', function() {
-            root.querySelectorAll('.xc-tab').forEach(function(t) { t.style.color = 'var(--text-secondary, #888)'; t.style.borderBottom = 'none'; });
-            root.querySelectorAll('.xc-panel').forEach(function(p) { p.style.display = 'none'; });
-            tab.style.color = '#1d9bf0';
-            tab.style.borderBottom = '2px solid #1d9bf0';
-            var panel = tab.getAttribute('data-xc').replace('tab-', 'panel-');
-            var panelEl = el(panel);
-            if (panelEl) panelEl.style.display = '';
-        });
-    });
-
-    function loadConfig() {
-        fetchApi(API).then(function(resp) { return resp.json(); }).then(function(c) {
-            if (c.error) return;
-
-            var tierEl = el('tier'); if (tierEl) tierEl.value = c.tier || 'pay_per_use';
-            var btEl = el('bearer_token'); if (btEl) btEl.value = c.bearer_token || '';
-
-            var o1 = c.oauth1 || {};
-            var f1 = el('oauth1_api_key'); if (f1) f1.value = o1.api_key || '';
-            var f2 = el('oauth1_api_secret'); if (f2) f2.value = o1.api_secret || '';
-            var f3 = el('oauth1_access_token'); if (f3) f3.value = o1.access_token || '';
-            var f4 = el('oauth1_access_token_secret'); if (f4) f4.value = o1.access_token_secret || '';
-
-            var o2 = c.oauth2 || {};
-            var c1 = el('oauth2_client_id'); if (c1) c1.value = o2.client_id || '';
-            var c2 = el('oauth2_client_secret'); if (c2) c2.value = o2.client_secret || '';
-            var ru = el('oauth2_redirect_uri'); if (ru) ru.value = o2.redirect_uri || 'http://localhost:3000/callback';
-
-            var svcs = c.services || {};
-            ['posting','reading','search','media','analytics'].forEach(function(s) {
-                var cb = el('svc-' + s); if (cb) cb.checked = (svcs[s] || {}).enabled !== false;
-            });
-
-            var defs = c.defaults || {};
-            var mr = el('max_results'); if (mr) mr.value = defs.max_results || 20;
-            var tn = el('thread_numbering'); if (tn) tn.checked = defs.thread_numbering !== false;
-            var dl = el('daily_limit'); if (dl) dl.value = (c.usage || {}).daily_tweet_limit || 50;
-
-            var sec = c.security || {};
-            var sc = el('sanitize_content'); if (sc) sc.checked = sec.sanitize_content !== false;
-            var ml = el('max_tweet_length'); if (ml) ml.value = sec.max_tweet_length || 280;
-        }).catch(function(e) {
-            console.error('Config load error:', e);
-        });
-    }
-
-    function saveConfig() {
-        var status = el('save-status');
-        if (status) { status.textContent = 'Saving...'; status.style.color = '#e65100'; }
-        var config = {
-            tier: (el('tier') || {}).value || 'pay_per_use',
-            bearer_token: (el('bearer_token') || {}).value || '',
-            oauth1: {
-                api_key: (el('oauth1_api_key') || {}).value || '',
-                api_secret: (el('oauth1_api_secret') || {}).value || '',
-                access_token: (el('oauth1_access_token') || {}).value || '',
-                access_token_secret: (el('oauth1_access_token_secret') || {}).value || '',
-            },
-            oauth2: {
-                client_id: (el('oauth2_client_id') || {}).value || '',
-                client_secret: (el('oauth2_client_secret') || {}).value || '',
-                redirect_uri: (el('oauth2_redirect_uri') || {}).value || 'http://localhost:3000/callback',
-            },
-            services: {
-                posting: {enabled: !!(el('svc-posting') || {}).checked},
-                reading: {enabled: !!(el('svc-reading') || {}).checked},
-                search: {enabled: !!(el('svc-search') || {}).checked},
-                media: {enabled: !!(el('svc-media') || {}).checked},
-                analytics: {enabled: !!(el('svc-analytics') || {}).checked},
-            },
-            defaults: {
-                max_results: parseInt((el('max_results') || {}).value) || 20,
-                thread_numbering: !!(el('thread_numbering') || {}).checked,
-            },
-            usage: {
-                daily_tweet_limit: parseInt((el('daily_limit') || {}).value) || 50,
-            },
-            security: {
-                sanitize_content: !!(el('sanitize_content') || {}).checked,
-                max_tweet_length: parseInt((el('max_tweet_length') || {}).value) || 280,
-            },
-        };
-        return fetchApi(API, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({action: 'set', config: config})
-        }).then(function(resp) { return resp.json(); }).then(function(data) {
-            if (!status) return;
-            if (data.ok) {
-                status.textContent = 'Saved!';
-                status.style.color = '#2e7d32';
-            } else {
-                status.textContent = data.error || 'Save failed';
-                status.style.color = '#c62828';
-            }
-            setTimeout(function() { status.textContent = ''; }, 3000);
-        }).catch(function() {
-            if (status) { status.textContent = 'Save failed'; status.style.color = '#c62828'; }
-        });
-    }
-
-    function startOAuth2() {
-        var status = el('oauth2-status');
-        var callbackSection = el('oauth2-callback-section');
-        saveConfig().then(function() {
-            if (status) status.textContent = 'Generating auth URL...';
-            return fetchApi(API, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({action: 'oauth2_url'})
-            });
-        }).then(function(resp) { return resp.json(); }).then(function(data) {
-            if (!status) return;
-            if (data.ok && data.url) {
-                window.open(data.url, '_blank');
-                status.innerHTML = 'Auth page opened — authorize and paste the redirect URL below';
-                status.style.color = '#e65100';
-                if (callbackSection) callbackSection.style.display = '';
-            } else {
-                status.textContent = data.error || 'Failed';
-                status.style.color = '#c62828';
-            }
-        }).catch(function() {
-            if (status) { status.textContent = 'Error generating URL'; status.style.color = '#c62828'; }
-        });
-    }
-
-    function completeOAuth2() {
-        var cbStatus = el('oauth2-callback-status');
-        var urlInput = el('oauth2-callback-url');
-        if (!urlInput || !urlInput.value.trim()) {
-            if (cbStatus) { cbStatus.textContent = 'Paste the redirect URL first'; cbStatus.style.color = '#c62828'; }
-            return;
-        }
-        // Parse code and state from the pasted URL
-        var code = '', state = '';
-        try {
-            var url = new URL(urlInput.value.trim());
-            code = url.searchParams.get('code') || '';
-            state = url.searchParams.get('state') || '';
-        } catch(e) {
-            // Maybe they pasted just the code
-            code = urlInput.value.trim();
-        }
-        if (!code) {
-            if (cbStatus) { cbStatus.textContent = 'Could not find authorization code in URL'; cbStatus.style.color = '#c62828'; }
-            return;
-        }
-        if (cbStatus) { cbStatus.textContent = 'Exchanging code for token...'; cbStatus.style.color = '#e65100'; }
-        fetchApi(API, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({action: 'oauth2_callback', code: code, state: state})
-        }).then(function(resp) { return resp.json(); }).then(function(data) {
-            if (!cbStatus) return;
-            if (data.ok) {
-                cbStatus.textContent = 'OAuth 2.0 connected!';
-                cbStatus.style.color = '#2e7d32';
-                var status = el('oauth2-status');
-                if (status) { status.textContent = 'Connected'; status.style.color = '#2e7d32'; }
-                var section = el('oauth2-callback-section');
-                if (section) setTimeout(function() { section.style.display = 'none'; }, 3000);
-            } else {
-                cbStatus.textContent = data.error || 'Token exchange failed';
-                cbStatus.style.color = '#c62828';
-            }
-        }).catch(function() {
-            if (cbStatus) { cbStatus.textContent = 'Request failed'; cbStatus.style.color = '#c62828'; }
-        });
-    }
-
-    el('save-btn')?.addEventListener('click', saveConfig);
-    el('oauth2-btn')?.addEventListener('click', startOAuth2);
-    el('oauth2-complete-btn')?.addEventListener('click', completeOAuth2);
-    loadConfig();
-})();
-</script>
+</body>
+</html>

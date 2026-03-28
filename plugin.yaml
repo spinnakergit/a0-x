@@ -1,7 +1,7 @@
 name: x
 title: X.com Integration
 description: Post, read, search, and manage content on X.com (Twitter) via API v2 with dual OAuth authentication.
-version: 1.0.0
+version: 1.1.0
 settings_sections:
   - external
 per_project_config: true
