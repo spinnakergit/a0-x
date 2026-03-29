@@ -33,7 +33,7 @@ def _find_python() -> str:
 
 
 def install(**kwargs):
-    """Post-install hook: set up symlink, data dir, deps, skills, toggle."""
+    """Post-install hook: set up data dir, deps, skills, toggle."""
     plugin_dir = _get_plugin_dir()
     a0_root = _get_a0_root()
     plugin_name = "x"
@@ -51,22 +51,7 @@ def install(**kwargs):
     data_dir.mkdir(exist_ok=True)
     os.chmod(str(data_dir), 0o700)
 
-    # 3. Create symlink so 'from plugins.x.helpers...' imports work
-    symlink = a0_root / "plugins" / plugin_name
-    if not symlink.exists():
-        symlink.symlink_to(plugin_dir)
-        print(f"[{plugin_name}] Created symlink: {symlink} -> {plugin_dir}")
-    elif symlink.is_symlink() and symlink.resolve() != plugin_dir:
-        symlink.unlink()
-        symlink.symlink_to(plugin_dir)
-        print(f"[{plugin_name}] Updated symlink: {symlink} -> {plugin_dir}")
-    elif symlink.is_dir() and not symlink.is_symlink():
-        import shutil
-        shutil.rmtree(str(symlink))
-        symlink.symlink_to(plugin_dir)
-        print(f"[{plugin_name}] Replaced directory with symlink: {symlink} -> {plugin_dir}")
-
-    # 4. Install skills
+    # 3. Install skills
     skills_src = plugin_dir / "skills"
     skills_dst = a0_root / "usr" / "skills"
     if skills_src.is_dir():
@@ -80,7 +65,7 @@ def install(**kwargs):
                         dest.write_bytes(f.read_bytes())
                 print(f"[{plugin_name}] Installed skill: {skill_dir.name}")
 
-    # 5. Install Python dependencies via initialize.py
+    # 4. Install Python dependencies via initialize.py
     init_script = plugin_dir / "initialize.py"
     if init_script.is_file():
         python = _find_python()
@@ -98,7 +83,7 @@ def install(**kwargs):
         except subprocess.TimeoutExpired:
             print(f"[{plugin_name}] Warning: dependency install timed out")
 
-    # 6. Mirror to /git/agent-zero if running in /a0 runtime
+    # 5. Mirror to /git/agent-zero if running in /a0 runtime
     if str(a0_root) == "/a0" and Path("/git/agent-zero/usr").is_dir():
         git_plugin = Path("/git/agent-zero/usr/plugins") / plugin_name
         if not git_plugin.exists():
@@ -112,21 +97,12 @@ def install(**kwargs):
 
 
 def uninstall(**kwargs):
-    """Pre-uninstall hook: clean up symlink and skills."""
+    """Pre-uninstall hook: clean up skills."""
     a0_root = _get_a0_root()
     plugin_name = "x"
 
     print(f"[{plugin_name}] Running uninstall hook...")
 
-    # Remove symlink
-    symlink = a0_root / "plugins" / plugin_name
-    if symlink.is_symlink():
-        symlink.unlink()
-        print(f"[{plugin_name}] Removed symlink: {symlink}")
-    elif symlink.is_dir():
-        import shutil
-        shutil.rmtree(str(symlink))
-        print(f"[{plugin_name}] Removed directory: {symlink}")
 
     # Remove skills
     skills_dst = a0_root / "usr" / "skills"

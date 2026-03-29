@@ -5,7 +5,7 @@ class XAnalytics(Tool):
     """View tweet and account analytics on X.com. Requires Pay-Per-Use or Basic+ tier."""
 
     async def execute(self, **kwargs) -> Response:
-        from plugins.x.helpers.x_auth import is_service_enabled
+        from usr.plugins.x.helpers.x_auth import is_service_enabled
         if not is_service_enabled("analytics", self.agent):
             return Response(
                 message="Analytics service is disabled or requires a paid API tier. "
@@ -17,21 +17,21 @@ class XAnalytics(Tool):
         action = self.args.get("action", "tweet")
         tweet_id = self.args.get("tweet_id", "")
 
-        from plugins.x.helpers.x_auth import get_x_config, require_tier
+        from usr.plugins.x.helpers.x_auth import get_x_config, require_tier
         config = get_x_config(self.agent)
 
         ok, msg = require_tier("pay_per_use", config)
         if not ok:
             return Response(message=msg, break_loop=False)
 
-        from plugins.x.helpers.x_client import XClient
+        from usr.plugins.x.helpers.x_client import XClient
         client = XClient(config)
 
         try:
             if action == "tweet":
                 if not tweet_id:
                     return Response(message="Error: 'tweet_id' is required for tweet analytics.", break_loop=False)
-                from plugins.x.helpers.sanitize import validate_tweet_id
+                from usr.plugins.x.helpers.sanitize import validate_tweet_id
                 try:
                     tweet_id = validate_tweet_id(tweet_id)
                 except ValueError as e:
@@ -72,7 +72,7 @@ class XAnalytics(Tool):
                     return Response(message="No user data returned.", break_loop=False)
 
                 # Get usage stats
-                from plugins.x.helpers.x_auth import get_usage, get_monthly_limit
+                from usr.plugins.x.helpers.x_auth import get_usage, get_monthly_limit
                 usage = get_usage(config)
                 monthly_limit = get_monthly_limit(config)
 

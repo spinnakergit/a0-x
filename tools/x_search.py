@@ -5,7 +5,7 @@ class XSearch(Tool):
     """Search recent tweets on X.com. Requires Pay-Per-Use or Basic+ tier."""
 
     async def execute(self, **kwargs) -> Response:
-        from plugins.x.helpers.x_auth import is_service_enabled
+        from usr.plugins.x.helpers.x_auth import is_service_enabled
         if not is_service_enabled("search", self.agent):
             return Response(
                 message="Search service is disabled or requires a paid API tier. "
@@ -30,14 +30,14 @@ class XSearch(Tool):
                 break_loop=False,
             )
 
-        from plugins.x.helpers.x_auth import get_x_config, require_tier
+        from usr.plugins.x.helpers.x_auth import get_x_config, require_tier
         config = get_x_config(self.agent)
 
         ok, msg = require_tier("pay_per_use", config)
         if not ok:
             return Response(message=msg, break_loop=False)
 
-        from plugins.x.helpers.x_client import XClient
+        from usr.plugins.x.helpers.x_client import XClient
         client = XClient(config)
 
         try:
@@ -61,7 +61,7 @@ class XSearch(Tool):
             if not data:
                 return Response(message=f"No tweets found for: {query}", break_loop=False)
 
-            from plugins.x.helpers.sanitize import format_tweets
+            from usr.plugins.x.helpers.sanitize import format_tweets
             return Response(
                 message=f"Found {count} tweet(s) for \"{query}\":\n\n{format_tweets(data)}",
                 break_loop=False,

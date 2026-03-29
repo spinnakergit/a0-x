@@ -65,12 +65,6 @@ python3 "$PLUGIN_DIR/initialize.py" || python "$PLUGIN_DIR/initialize.py"
 
 touch "$PLUGIN_DIR/.toggle-1"
 
-SYMLINK="$A0_ROOT/plugins/x"
-if [ ! -e "$SYMLINK" ]; then
-    ln -sf "$PLUGIN_DIR" "$SYMLINK"
-    echo "Created symlink: $SYMLINK -> $PLUGIN_DIR"
-fi
-
 if [ "$A0_ROOT" = "/a0" ] && [ -d "/git/agent-zero/usr" ]; then
     GIT_PLUGIN="/git/agent-zero/usr/plugins/x"
     mkdir -p "$(dirname "$GIT_PLUGIN")"

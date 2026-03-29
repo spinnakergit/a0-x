@@ -5,7 +5,7 @@ class XRead(Tool):
     """Read tweets, timelines, and mentions from X.com. Requires Pay-Per-Use or Basic+ tier."""
 
     async def execute(self, **kwargs) -> Response:
-        from plugins.x.helpers.x_auth import is_service_enabled
+        from usr.plugins.x.helpers.x_auth import is_service_enabled
         if not is_service_enabled("reading", self.agent):
             return Response(
                 message="Reading service is disabled or requires a paid API tier. "
@@ -19,17 +19,17 @@ class XRead(Tool):
         username = self.args.get("username", "")
         max_results = int(self.args.get("max_results", "20"))
 
-        from plugins.x.helpers.x_auth import get_x_config, require_tier
+        from usr.plugins.x.helpers.x_auth import get_x_config, require_tier
         config = get_x_config(self.agent)
 
-        from plugins.x.helpers.x_client import XClient
+        from usr.plugins.x.helpers.x_client import XClient
         client = XClient(config)
 
         try:
             if action == "tweet":
                 if not tweet_id:
                     return Response(message="Error: 'tweet_id' is required to read a tweet.", break_loop=False)
-                from plugins.x.helpers.sanitize import validate_tweet_id
+                from usr.plugins.x.helpers.sanitize import validate_tweet_id
                 try:
                     tweet_id = validate_tweet_id(tweet_id)
                 except ValueError as e:
@@ -43,7 +43,7 @@ class XRead(Tool):
             elif action == "user_tweets":
                 if not username:
                     return Response(message="Error: 'username' is required for user_tweets.", break_loop=False)
-                from plugins.x.helpers.sanitize import validate_username
+                from usr.plugins.x.helpers.sanitize import validate_username
                 try:
                     username = validate_username(username)
                 except ValueError as e:
@@ -106,13 +106,13 @@ class XRead(Tool):
                 return Response(message="No data returned.", break_loop=False)
 
             if isinstance(data, list):
-                from plugins.x.helpers.sanitize import format_tweets
+                from usr.plugins.x.helpers.sanitize import format_tweets
                 return Response(
                     message=f"Found {len(data)} tweet(s):\n\n{format_tweets(data)}",
                     break_loop=False,
                 )
             else:
-                from plugins.x.helpers.sanitize import format_tweet
+                from usr.plugins.x.helpers.sanitize import format_tweet
                 return Response(message=format_tweet(data), break_loop=False)
 
         except ValueError as e:

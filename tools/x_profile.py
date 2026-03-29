@@ -8,10 +8,10 @@ class XProfile(Tool):
         action = self.args.get("action", "me")
         username = self.args.get("username", "")
 
-        from plugins.x.helpers.x_auth import get_x_config
+        from usr.plugins.x.helpers.x_auth import get_x_config
         config = get_x_config(self.agent)
 
-        from plugins.x.helpers.x_client import XClient
+        from usr.plugins.x.helpers.x_client import XClient
         client = XClient(config)
 
         try:
@@ -23,7 +23,7 @@ class XProfile(Tool):
             elif action == "lookup":
                 if not username:
                     return Response(message="Error: 'username' is required for lookup.", break_loop=False)
-                from plugins.x.helpers.sanitize import validate_username
+                from usr.plugins.x.helpers.sanitize import validate_username
                 try:
                     username = validate_username(username)
                 except ValueError as e:

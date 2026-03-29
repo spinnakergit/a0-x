@@ -5,7 +5,7 @@ class XMedia(Tool):
     """Upload media (images, videos, GIFs) to X.com for use in tweets."""
 
     async def execute(self, **kwargs) -> Response:
-        from plugins.x.helpers.x_auth import is_service_enabled
+        from usr.plugins.x.helpers.x_auth import is_service_enabled
         if not is_service_enabled("media", self.agent):
             return Response(
                 message="Media service is disabled. Enable it in X.com plugin settings.",
@@ -70,7 +70,7 @@ class XMedia(Tool):
                     break_loop=False,
                 )
 
-            from plugins.x.helpers.x_auth import get_x_config, has_oauth1
+            from usr.plugins.x.helpers.x_auth import get_x_config, has_oauth1
             config = get_x_config(self.agent)
 
             if not has_oauth1(config):
@@ -80,7 +80,7 @@ class XMedia(Tool):
                     break_loop=False,
                 )
 
-            from plugins.x.helpers.x_media_client import XMediaClient
+            from usr.plugins.x.helpers.x_media_client import XMediaClient
             media_client = XMediaClient(config)
 
             try:

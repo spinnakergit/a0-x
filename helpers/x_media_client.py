@@ -30,7 +30,7 @@ class XMediaClient:
     def _get_oauth1(self):
         """Build OAuth1 auth object for requests."""
         from requests_oauthlib import OAuth1
-        from plugins.x.helpers.x_auth import get_oauth1_credentials
+        from usr.plugins.x.helpers.x_auth import get_oauth1_credentials
 
         creds = get_oauth1_credentials(self.config)
         return OAuth1(

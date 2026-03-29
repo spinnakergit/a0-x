@@ -6,7 +6,7 @@ class XPost(Tool):
 
     async def execute(self, **kwargs) -> Response:
         # Service toggle guard
-        from plugins.x.helpers.x_auth import is_service_enabled
+        from usr.plugins.x.helpers.x_auth import is_service_enabled
         if not is_service_enabled("posting", self.agent):
             return Response(
                 message="Posting service is disabled. Enable it in X.com plugin settings.",
@@ -24,7 +24,7 @@ class XPost(Tool):
             return Response(message="Error: 'text' is required.", break_loop=False)
 
         # Sanitize and validate
-        from plugins.x.helpers.sanitize import (
+        from usr.plugins.x.helpers.sanitize import (
             sanitize_tweet_text,
             validate_tweet_length,
             validate_tweet_id,
@@ -40,14 +40,14 @@ class XPost(Tool):
             )
 
         # Check write budget
-        from plugins.x.helpers.x_auth import get_x_config, check_write_budget
+        from usr.plugins.x.helpers.x_auth import get_x_config, check_write_budget
         config = get_x_config(self.agent)
         can_write, budget_msg = check_write_budget(config)
         if not can_write:
             return Response(message=f"Error: {budget_msg}", break_loop=False)
 
         # Build client and post
-        from plugins.x.helpers.x_client import XClient
+        from usr.plugins.x.helpers.x_client import XClient
         client = XClient(config)
 
         try:

@@ -5,7 +5,7 @@ class XThread(Tool):
     """Post a thread (multiple connected tweets) on X.com."""
 
     async def execute(self, **kwargs) -> Response:
-        from plugins.x.helpers.x_auth import is_service_enabled
+        from usr.plugins.x.helpers.x_auth import is_service_enabled
         if not is_service_enabled("posting", self.agent):
             return Response(
                 message="Posting service is disabled. Enable it in X.com plugin settings.",
@@ -38,7 +38,7 @@ class XThread(Tool):
                 break_loop=False,
             )
 
-        from plugins.x.helpers.sanitize import (
+        from usr.plugins.x.helpers.sanitize import (
             sanitize_tweet_text,
             validate_tweet_length,
             MAX_THREAD_TWEETS,
@@ -66,7 +66,7 @@ class XThread(Tool):
             validated.append(text)
 
         # Check write budget for all tweets
-        from plugins.x.helpers.x_auth import get_x_config, check_write_budget, get_usage, get_monthly_limit
+        from usr.plugins.x.helpers.x_auth import get_x_config, check_write_budget, get_usage, get_monthly_limit
         config = get_x_config(self.agent)
         usage = get_usage(config)
         monthly_limit = get_monthly_limit(config)
@@ -78,7 +78,7 @@ class XThread(Tool):
                 break_loop=False,
             )
 
-        from plugins.x.helpers.x_client import XClient
+        from usr.plugins.x.helpers.x_client import XClient
         client = XClient(config)
 
         try:

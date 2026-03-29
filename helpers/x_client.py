@@ -48,7 +48,7 @@ class XClient:
     @classmethod
     def from_config(cls, agent=None):
         """Factory: create client from A0 plugin config."""
-        from plugins.x.helpers.x_auth import get_x_config
+        from usr.plugins.x.helpers.x_auth import get_x_config
         config = get_x_config(agent)
         return cls(config)
 
@@ -63,14 +63,14 @@ class XClient:
 
     def _get_headers(self) -> dict:
         """Get auth headers for API v2 requests (OAuth 2.0 or Bearer)."""
-        from plugins.x.helpers.x_auth import get_oauth2_headers
+        from usr.plugins.x.helpers.x_auth import get_oauth2_headers
         headers = get_oauth2_headers(self.config)
         headers["Content-Type"] = "application/json"
         return headers
 
     def _use_oauth1(self) -> bool:
         """Check if we should use OAuth 1.0a for API v2 calls."""
-        from plugins.x.helpers.x_auth import get_oauth2_headers, has_oauth1
+        from usr.plugins.x.helpers.x_auth import get_oauth2_headers, has_oauth1
         headers = get_oauth2_headers(self.config)
         # Use OAuth 1.0a when no OAuth 2.0 token or Bearer token is available
         return "Authorization" not in headers and has_oauth1(self.config)
@@ -81,7 +81,7 @@ class XClient:
         """Make a request using OAuth 1.0a (via requests in executor)."""
         import requests
         from requests_oauthlib import OAuth1
-        from plugins.x.helpers.x_auth import get_oauth1_credentials
+        from usr.plugins.x.helpers.x_auth import get_oauth1_credentials
 
         creds = get_oauth1_credentials(self.config)
         auth = OAuth1(
@@ -208,7 +208,7 @@ class XClient:
         result = await self._request("POST", "/tweets", json_body=body)
 
         if not result.get("error"):
-            from plugins.x.helpers.x_auth import increment_usage
+            from usr.plugins.x.helpers.x_auth import increment_usage
             increment_usage(self.config)
 
         return result
@@ -217,7 +217,7 @@ class XClient:
         """Delete a tweet by ID."""
         result = await self._request("DELETE", f"/tweets/{tweet_id}")
         if not result.get("error"):
-            from plugins.x.helpers.x_auth import increment_usage
+            from usr.plugins.x.helpers.x_auth import increment_usage
             increment_usage(self.config, "tweets_deleted")
         return result
 

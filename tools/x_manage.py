@@ -5,7 +5,7 @@ class XManage(Tool):
     """Manage tweets and engagement on X.com: delete, like, unlike, retweet, unretweet, bookmark."""
 
     async def execute(self, **kwargs) -> Response:
-        from plugins.x.helpers.x_auth import is_service_enabled
+        from usr.plugins.x.helpers.x_auth import is_service_enabled
         if not is_service_enabled("posting", self.agent):
             return Response(
                 message="Posting service is disabled. Enable it in X.com plugin settings.",
@@ -20,13 +20,13 @@ class XManage(Tool):
         if not tweet_id:
             return Response(message="Error: 'tweet_id' is required.", break_loop=False)
 
-        from plugins.x.helpers.sanitize import validate_tweet_id
+        from usr.plugins.x.helpers.sanitize import validate_tweet_id
         try:
             tweet_id = validate_tweet_id(tweet_id)
         except ValueError as e:
             return Response(message=f"Validation error: {e}", break_loop=False)
 
-        from plugins.x.helpers.x_auth import get_x_config, check_write_budget
+        from usr.plugins.x.helpers.x_auth import get_x_config, check_write_budget
         config = get_x_config(self.agent)
 
         # Delete counts against write budget
@@ -37,7 +37,7 @@ class XManage(Tool):
 
         # Bookmark/unbookmark require OAuth 2.0 User Context — not supported via OAuth 1.0a
         if action in ("bookmark", "unbookmark"):
-            from plugins.x.helpers.x_auth import get_oauth2_token
+            from usr.plugins.x.helpers.x_auth import get_oauth2_token
             token = get_oauth2_token(config)
             if not token.get("access_token"):
                 return Response(
@@ -49,7 +49,7 @@ class XManage(Tool):
                     break_loop=False,
                 )
 
-        from plugins.x.helpers.x_client import XClient
+        from usr.plugins.x.helpers.x_client import XClient
         client = XClient(config)
 
         try:

@@ -106,7 +106,7 @@ class XConfigApi(ApiHandler):
                     config = {}
 
             # Add auth status
-            from plugins.x.helpers.x_auth import has_any_auth, get_tier, get_usage, get_monthly_limit
+            from usr.plugins.x.helpers.x_auth import has_any_auth, get_tier, get_usage, get_monthly_limit
             config["_auth_configured"] = has_any_auth(config)
             config["_tier"] = get_tier(config)
             usage = get_usage(config)
@@ -160,14 +160,14 @@ class XConfigApi(ApiHandler):
                 with open(config_path, "r") as f:
                     config = json.load(f)
 
-            from plugins.x.helpers.x_auth import generate_oauth2_auth_url
+            from usr.plugins.x.helpers.x_auth import generate_oauth2_auth_url
             url, state, verifier = generate_oauth2_auth_url(config)
 
             if not url:
                 return {"error": "OAuth 2.0 client_id not configured"}
 
             # Store state and verifier for callback
-            from plugins.x.helpers.x_auth import _data_dir, secure_write_json
+            from usr.plugins.x.helpers.x_auth import _data_dir, secure_write_json
             data_dir = _data_dir(config)
             secure_write_json(data_dir / "oauth2_state.json", {
                 "state": state,
@@ -192,7 +192,7 @@ class XConfigApi(ApiHandler):
                 with open(config_path, "r") as f:
                     config = json.load(f)
 
-            from plugins.x.helpers.x_auth import _data_dir, _read_json, save_oauth2_token
+            from usr.plugins.x.helpers.x_auth import _data_dir, _read_json, save_oauth2_token
             data_dir = _data_dir(config)
             stored = _read_json(data_dir / "oauth2_state.json")
 
@@ -201,7 +201,7 @@ class XConfigApi(ApiHandler):
 
             # Exchange code for token
             import requests
-            from plugins.x.helpers.x_auth import OAUTH2_TOKEN_URL
+            from usr.plugins.x.helpers.x_auth import OAUTH2_TOKEN_URL
 
             client_id = config.get("oauth2", {}).get("client_id", "")
             client_secret = config.get("oauth2", {}).get("client_secret", "")
@@ -248,7 +248,7 @@ class XConfigApi(ApiHandler):
                 with open(config_path, "r") as f:
                     config = json.load(f)
 
-            from plugins.x.helpers.x_auth import is_authenticated, get_tier
+            from usr.plugins.x.helpers.x_auth import is_authenticated, get_tier
             ok, info = is_authenticated(config)
 
             return {
