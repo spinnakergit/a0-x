@@ -31,6 +31,16 @@ class XTest(ApiHandler):
                         config = json.load(f)
                     break
 
+            # Self-heal: ensure symlink exists for plugin namespace imports
+            plugin_dir = Path(__file__).resolve().parent.parent
+            for root in [Path("/a0"), Path("/git/agent-zero")]:
+                plugins_dir = root / "plugins"
+                if plugins_dir.is_dir():
+                    symlink = plugins_dir / "x"
+                    if not symlink.exists():
+                        symlink.symlink_to(plugin_dir)
+                    break
+
             from plugins.x.helpers.x_auth import is_authenticated, get_tier, has_any_auth
 
             if not has_any_auth(config):
